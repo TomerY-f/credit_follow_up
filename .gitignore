@@ -1,0 +1,22 @@
+# IDE settings
+.vscode/
+.idea/
+
+# Excel files
+*.xlsx
+*.xls
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+.venv/
+
+# Mac
+.DS_Store
+
