@@ -37,7 +37,7 @@ class DataHandler:
         """
         Finds the column name corresponding to the business/merchant name.
         """
-        return self._find_column_by_candidates(['שם בית העסק'])
+        return self._find_column_by_candidates(['שם בית עסק'])
 
     def _find_amount_column(self):
         """
