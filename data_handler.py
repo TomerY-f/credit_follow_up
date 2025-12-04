@@ -21,12 +21,51 @@ class DataHandler:
     def _load_data(self):
         """
         Load data and normalize column names.
+        Handles header detection and summary row removal.
         """
         try:
-            df = pd.read_excel(self.file_path)
+            # First load without header to inspect structure
+            df_raw = pd.read_excel(self.file_path, header=None)
+            
+            # Look for the header row by checking for known columns
+            header_row_idx = None
+            # Add 'שם בית עסק' which is used in some files, and keep basic ones
+            known_columns = ['תאריך עסקה', 'שם בית העסק', 'שם בית עסק', 'סכום חיוב', 'ענף']
+            
+            for i in range(min(10, len(df_raw))):
+                # Get row values and normalize (replace newlines with spaces)
+                row_values = [str(val).replace('\n', ' ').strip() for val in df_raw.iloc[i].tolist()]
+                
+                # Check if at least 2 known columns are present
+                match_count = sum(1 for col in known_columns if any(col in val for val in row_values))
+                if match_count >= 2:
+                    header_row_idx = i
+                    break
+            
+            if header_row_idx is not None:
+                # Reload with correct header
+                df = pd.read_excel(self.file_path, header=header_row_idx)
+            else:
+                # Fallback: Assume standard format or header at 0
+                df = pd.read_excel(self.file_path)
             
             # Normalize column names: remove newlines and strip whitespace
             df.columns = [str(col).replace('\n', ' ').strip() for col in df.columns]
+            
+            # Clean up data:
+            # 1. Identify necessary columns
+            amount_col_candidate = None
+            for col in df.columns:
+                if 'סכום חיוב' in col:
+                    amount_col_candidate = col
+                    break
+            
+            if amount_col_candidate:
+                # Remove rows where amount is NaN (empty rows)
+                df = df.dropna(subset=[amount_col_candidate])
+                
+                # Remove rows that seem to be footers (text in amount column)
+                df = df[pd.to_numeric(df[amount_col_candidate], errors='coerce').notna()]
             
             return df
         except Exception as e:
@@ -37,7 +76,7 @@ class DataHandler:
         """
         Finds the column name corresponding to the business/merchant name.
         """
-        return self._find_column_by_candidates(['שם בית עסק'])
+        return self._find_column_by_candidates(['שם בית עסק', 'שם בית', 'שם עסק', 'תיאור עסקה', 'שם'])
 
     def _find_amount_column(self):
         """
@@ -93,6 +132,9 @@ class DataHandler:
             tuple: (avg_category_series, avg_total_amount)
         """
         bills_dir = os.path.dirname(self.file_path)
+        if not os.path.exists(bills_dir):
+             return pd.Series(), 0
+
         all_files = [f for f in os.listdir(bills_dir) if f.endswith('.xlsx') and f != self.filename]
         
         if not all_files:
