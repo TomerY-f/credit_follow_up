@@ -21,6 +21,7 @@ def create_app(data_handler):
         values=summary.values,
         hole=0.3, # Donut style
         textinfo='label+percent',
+        textposition='inside',
         hoverinfo='label+value+percent',
         customdata=summary.index # Pass label explicitly for click data
     )])
@@ -28,7 +29,9 @@ def create_app(data_handler):
     fig.update_layout(
         title_text='סכום עסקאות לפי ענף (לחץ על פלח לפירוט)',
         title_x=0.5,
-        clickmode='event+select'
+        clickmode='event+select',
+        showlegend=False,
+        height=800
     )
 
     # Define Safe Column IDs for the Table (avoids Hebrew/Encoding issues in CSS)
