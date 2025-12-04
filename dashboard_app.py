@@ -35,15 +35,21 @@ def create_app(data_handler):
     # Ordering: Amount first (Left), Business second (Right) to simulate RTL in LTR mode
     TABLE_COLUMNS = []
     if real_amount_col:
-        TABLE_COLUMNS.append({'name': 'סכום עסקה', 'id': 'amount_col'})
+        TABLE_COLUMNS.append({'name': 'סכום חיוב', 'id': 'amount_col'})
     if real_business_col:
         TABLE_COLUMNS.append({'name': 'שם בית העסק', 'id': 'business_col'})
+
+    # Calculate total expenses
+    total_expenses = 0
+    if data_handler.amount_col and not data_handler.df.empty:
+         total_expenses = data_handler.df[data_handler.amount_col].sum()
 
     # Define the App Layout
     # Removed global RTL to avoid Table layout issues
     app.layout = html.Div([
         # Header
         html.H1(f"דוח הוצאות - {data_handler.filename}", style={'textAlign': 'center', 'fontFamily': 'Arial', 'direction': 'rtl'}),
+        html.H2(f"סה\"כ לחודש: {total_expenses:,.2f} ₪", style={'textAlign': 'center', 'fontFamily': 'Arial', 'direction': 'rtl', 'color': '#2c3e50'}),
         
         # Main Container
         html.Div([

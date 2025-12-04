@@ -41,6 +41,6 @@ python main.py October_2025.xlsx
 The Excel file should contain at least the following columns (Hebrew):
 *   **ענף** (Category)
 *   **שם בית העסק** (Business Name)
-*   **סכום עסקה** (Transaction Amount)
+*   **סכום חיוב** (Transaction Amount)
 
 The tool attempts to handle variations in column names automatically.

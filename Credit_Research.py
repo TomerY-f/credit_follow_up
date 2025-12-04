@@ -19,8 +19,8 @@ def analyze_credit_data(file_path):
     print(f"\nFirst few rows:")
     print(df.head())
     
-    # 3. Sum "סכום עסקה" values according to "ענף" key names
-    summary = df.groupby('ענף')['סכום\nעסקה'].sum().sort_values(ascending=False)
+    # 3. Sum "סכום חיוב" values according to "ענף" key names
+    summary = df.groupby('ענף')['סכום\nחיוב'].sum().sort_values(ascending=False)
     
     print(f"\n\nSummary by ענף:")
     print(summary)

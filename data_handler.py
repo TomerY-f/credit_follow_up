@@ -53,7 +53,7 @@ class DataHandler:
         if self.df.empty:
             return None
             
-        candidates = ['סכום עסקה', 'סכום', 'סכום חיוב', 'Amount']
+        candidates = ['סכום חיוב']
         
         # First try exact matches from candidates
         for col in self.df.columns:
@@ -61,13 +61,7 @@ class DataHandler:
                 # Ensure it's numeric
                 self.df[col] = pd.to_numeric(self.df[col], errors='coerce').fillna(0)
                 return col
-        
-        # Then try partial matches
-        for col in self.df.columns:
-            for candidate in candidates:
-                if candidate in col:
-                    self.df[col] = pd.to_numeric(self.df[col], errors='coerce').fillna(0)
-                    return col
+
         return None
 
     def get_category_summary(self):
