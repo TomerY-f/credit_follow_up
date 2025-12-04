@@ -47,6 +47,36 @@ def create_app(data_handler):
     if data_handler.amount_col and not data_handler.df.empty:
          total_expenses = data_handler.df[data_handler.amount_col].sum()
 
+    # --- Comparison Bar Chart Logic ---
+    avg_summary, avg_total = data_handler.get_comparison_stats()
+
+    # Combine categories
+    all_categories = sorted(list(set(summary.index) | set(avg_summary.index)))
+    
+    # Prepare values
+    current_values = [summary.get(cat, 0) for cat in all_categories]
+    avg_values = [avg_summary.get(cat, 0) for cat in all_categories]
+    
+    # Add Total
+    all_categories = ['סה"כ'] + all_categories
+    current_values = [total_expenses] + current_values
+    avg_values = [avg_total] + avg_values
+    
+    bar_fig = go.Figure(data=[
+        go.Bar(name='נוכחי', x=all_categories, y=current_values, text=current_values, texttemplate='%{text:.0f}', textposition='auto'),
+        go.Bar(name='ממוצע', x=all_categories, y=avg_values, text=avg_values, texttemplate='%{text:.0f}', textposition='auto')
+    ])
+    
+    bar_fig.update_layout(
+        title_text='השוואה לממוצע חודשי (נוכחי מול ממוצע חודשים קודמים)',
+        title_x=0.5,
+        barmode='group',
+        xaxis_title='קטגוריה',
+        yaxis_title='סכום (₪)',
+        height=500
+    )
+    # ----------------------------------
+
     # Define the App Layout
     # Removed global RTL to avoid Table layout issues
     app.layout = html.Div([
@@ -94,7 +124,13 @@ def create_app(data_handler):
                     }
                 )
             ], style={'width': '45%', 'display': 'inline-block', 'verticalAlign': 'top', 'paddingLeft': '20px'})
-        ])
+        ]),
+        
+        # Comparison Chart Section
+        html.Div([
+            html.Hr(),
+            dcc.Graph(id='comparison-bar-chart', figure=bar_fig)
+        ], style={'width': '95%', 'margin': 'auto', 'marginTop': '30px'})
     ])
 
     # Define Interaction Callback
