@@ -44,4 +44,3 @@ The Excel file should contain at least the following columns (Hebrew):
 *   **סכום עסקה** (Transaction Amount)
 
 The tool attempts to handle variations in column names automatically.
-
